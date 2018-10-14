@@ -49,6 +49,7 @@ project(':agent') {
         compile project(':fuzz')
 
         testCompile 'junit:junit:4.12'
+        testCompile fileTree(dir: 'libs', include: ['*.jar'])
     }
     build.dependsOn 'shadowJar'
     shadowJar {
@@ -62,7 +63,7 @@ project(':agent') {
     }
     test {
         dependsOn 'compileJava', 'shadowJar'
-        jvmArgs '-javaagent:build/libs/jwp-agent.jar'
+        jvmArgs '-javaagent:build/libs/agent-' + version + '.jar'
         outputs.upToDateWhen { false }
         testLogging.showStandardStreams = true
     }
@@ -130,8 +131,8 @@ project(':examples') {
 
 project(':examples:csv') {
     mainClassName = 'jwp.examples.csv.Main'
-    run.jvmArgs '-javaagent:../../agent/build/libs/jwp-agent.jar'
-    test.jvmArgs '-javaagent:../../agent/build/libs/jwp-agent.jar'
+    run.jvmArgs '-javaagent:../../agent/build/libs/agent-' + version + '.jar'
+    test.jvmArgs '-javaagent:../../agent/build/libs/agent-' + version + '.jar'
     run.args 'src/test/java', 'jwp.examples.csv.MainTest'
     configurations {
         externalClasses
@@ -184,7 +185,7 @@ project(':examples:csv') {
 
 project(':examples:htmlsan') {
     mainClassName = 'jwp.examples.htmlsan.Main'
-    run.jvmArgs '-javaagent:../../agent/build/libs/jwp-agent.jar'
+    run.jvmArgs '-javaagent:../../agent/build/libs/agent-' + version + '.jar'
     dependencies {
         compile 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20171016.1'
         compile 'org.owasp.encoder:encoder:1.2.1'
@@ -194,7 +195,7 @@ project(':examples:htmlsan') {
 
 project(':examples:simple') {
     mainClassName = 'jwp.examples.simple.Main'
-    run.jvmArgs '-javaagent:../../agent/build/libs/jwp-agent.jar'
+    run.jvmArgs '-javaagent:../../agent/build/libs/agent-' + version + '.jar'
 }
 
 
@@ -205,7 +206,7 @@ javadoc {
     destinationDir = file("${buildDir}/docs/javadoc")
 }
 
-configurations.archives.artifacts.removeAll { it.archiveTask.is jar }
+//configurations.archives.artifacts.removeAll { it.archiveTask.is jar }
 
 def publishSettings(project, projectName, projectDescription, changeScopeToProvided = []) {
     project.with {

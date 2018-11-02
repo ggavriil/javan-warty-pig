@@ -23,6 +23,12 @@ public abstract class ParamProvider implements AutoCloseable {
     return new Suggested(gens);
   }
 
+  public static Suggested singleInteger(Stream<Integer> initial) {
+     ParamGenerator<?>[] gens = new ParamGenerator[1];
+     gens[0] = ParamGenerator.suggestedFiniteIntegers(initial);
+     return new Suggested(gens);
+  }
+
   /**
    * The immutable set of parameter generators that are closed when this is and have their
    * {@link ParamGenerator#onResult(ExecutionResult, int, Object)} called via {@link #onResult(ExecutionResult)}.

@@ -114,12 +114,8 @@ public interface ParamGenerator<T> extends AutoCloseable {
     throw new IllegalArgumentException("No suggested generator for " + cls);
   }
 
-  static <T> ParamGenerator<T> suggested(Class<T> cls, Stream<T> initial) {
-    return null;
-  }
-
-  static <T> ParamGenerator<T> suggestedFinitie(Class<T> cls, Stream<T> initial) {
-    return null;
+  static ParamGenerator<Integer> suggestedFiniteIntegers(Stream<Integer> initial) {
+    return ofFinite(() -> Stream.concat(Stream.of((Integer) null, interestingInts().boxed()), initial));
   }
 
   /**
@@ -135,7 +131,7 @@ public interface ParamGenerator<T> extends AutoCloseable {
     if (cls == Short.TYPE) return ofFinite(ParamGenerator::interestingShorts);
     if (cls == Short.class) return ofFinite(() -> Stream.concat(Stream.of((Integer) null), interestingShorts().boxed()));
     if (cls == Integer.TYPE) return ofFinite(ParamGenerator::interestingInts);
-    if (cls == Integer.class) return ofFinite(() -> Stream.concat(Stream.concat(Stream.of((Integer) null), interestingInts().boxed()), Stream.of(Integer.valueOf(62), Integer.valueOf(17), Integer.valueOf(121), Integer.valueOf(3))));
+    if (cls == Integer.class) return ofFinite(() -> Stream.concat(Stream.of((Integer) null), interestingInts().boxed()));
     if (cls == Long.TYPE) return ofFinite(ParamGenerator::interestingLongs);
     if (cls == Long.class) return ofFinite(() -> Stream.concat(Stream.of((Long) null), interestingLongs().boxed()));
     if (cls == Float.TYPE) return ofFinite(ParamGenerator::interestingFloats);

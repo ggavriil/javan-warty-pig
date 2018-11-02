@@ -654,6 +654,8 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
       @Override
       public void enqueue(TestCase entry) {
         Objects.requireNonNull(entry.branchHits);
+        //TODO[gg]
+        System.out.println(Arrays.toString(entry.bytes));
         synchronized (queue) {
           queue.add(entry);
           enqueuedSinceLastDequeued = true;

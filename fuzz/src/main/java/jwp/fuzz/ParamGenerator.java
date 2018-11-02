@@ -114,6 +114,14 @@ public interface ParamGenerator<T> extends AutoCloseable {
     throw new IllegalArgumentException("No suggested generator for " + cls);
   }
 
+  static <T> ParamGenerator<T> suggested(Class<T> cls, Stream<T> initial) {
+    return null;
+  }
+
+  static <T> ParamGenerator<T> suggestedFinitie(Class<T> cls, Stream<T> initial) {
+    return null;
+  }
+
   /**
    * Get a finite parameter generator for the given class. Only some classes are supported. An exception is thrown if a
    * class is not supported.

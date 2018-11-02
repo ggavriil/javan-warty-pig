@@ -668,6 +668,11 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
             enqueuedSinceLastDequeued = false;
             cull();
           }
+          //TODO[gg]
+          TestCase res = queue.isEmpty() ? null : queue.remove(0);
+          if(res != null) {
+            System.out.println(Arrays.toString(res.bytes));
+          }
           return queue.isEmpty() ? null : queue.remove(0);
         }
       }

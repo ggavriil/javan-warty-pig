@@ -3,10 +3,7 @@ package jwp.fuzz;
 import org.objectweb.asm.Opcodes;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -15,7 +12,7 @@ public class BranchTracker {
 
   /** Map storing all hits by thread */
   public static final ConcurrentMap<Thread, BranchHits> branchHits = new ConcurrentHashMap<>();
-
+  public static final ConcurrentMap<Thread, BitSet> threadBranches = new ConcurrentHashMap<>();
   /** The set of method refs for the tracker */
   public static final MethodBranchAdapter.MethodRefs refs;
 
@@ -53,6 +50,23 @@ public class BranchTracker {
   public static void beginTrackingForThread(Thread thread) {
     if (branchHits.putIfAbsent(thread, new BranchHits(thread.getId())) != null)
       throw new IllegalArgumentException("Thread already being tracked");
+    BitSet newSet = new BitSet();
+    newSet.set(0);
+    threadBranches.put(thread, newSet);
+  }
+
+  public static void addBranchPath(boolean val) {
+    BitSet bset = threadBranches.get(Thread.currentThread());
+    if(bset == null) {
+      return;
+    }
+    int length = bset.length();
+    if(val) {
+      bset.set(length - 1);
+    } else {
+      bset.clear(length - 1);
+    }
+    bset.set(length);
   }
 
   /** Stop tracking the given thread. Returns null if never started. */
@@ -70,82 +84,133 @@ public class BranchTracker {
 
   /** Called on IFEQ */
   public static void ifEqCheck(int value, int branchHash) {
-    if (value == 0) addBranchHash(branchHash);
+    addBranchPath(value == 0);
+    if (value == 0) {
+      addBranchHash(branchHash);
+    } else {
+
+    }
   }
 
   /** Called on IFNE */
   public static void ifNeCheck(int value, int branchHash) {
-    if (value != 0) addBranchHash(branchHash);
+    addBranchPath(value != 0);
+    if (value != 0) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IFLT */
   public static void ifLtCheck(int value, int branchHash) {
-    if (value < 0) addBranchHash(branchHash);
+    addBranchPath(value < 0);
+    if (value < 0) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IFLE */
   public static void ifLeCheck(int value, int branchHash) {
-    if (value <= 0) addBranchHash(branchHash);
+    addBranchPath(value <= 0);
+    if (value <= 0) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IFGT */
   public static void ifGtCheck(int value, int branchHash) {
-    if (value > 0) addBranchHash(branchHash);
+    addBranchPath(value > 0);
+    if (value > 0) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IFGE */
   public static void ifGeCheck(int value, int branchHash) {
-    if (value >= 0) addBranchHash(branchHash);
+    addBranchPath(value >= 0);
+    if (value >= 0) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IF_ICMPEQ */
   public static void ifIcmpEqCheck(int lvalue, int rvalue, int branchHash) {
-    if (lvalue == rvalue) addBranchHash(branchHash);
+    addBranchPath(lvalue == rvalue);
+    if (lvalue == rvalue) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IF_ICMPNE */
   public static void ifIcmpNeCheck(int lvalue, int rvalue, int branchHash) {
-    if (lvalue != rvalue) addBranchHash(branchHash);
+    addBranchPath(lvalue != rvalue);
+    if (lvalue != rvalue) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IF_ICMPLT */
   public static void ifIcmpLtCheck(int lvalue, int rvalue, int branchHash) {
-    if (lvalue < rvalue) addBranchHash(branchHash);
+    addBranchPath(lvalue < rvalue);
+    if (lvalue < rvalue) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IF_ICMPLE */
   public static void ifIcmpLeCheck(int lvalue, int rvalue, int branchHash) {
-    if (lvalue <= rvalue) addBranchHash(branchHash);
+    addBranchPath(lvalue <= rvalue);
+    if (lvalue <= rvalue) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IF_ICMPGT */
   public static void ifIcmpGtCheck(int lvalue, int rvalue, int branchHash) {
-    if (lvalue > rvalue) addBranchHash(branchHash);
+    addBranchPath(lvalue > rvalue);
+    if (lvalue > rvalue) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IF_ICMPGE */
   public static void ifIcmpGeCheck(int lvalue, int rvalue, int branchHash) {
-    if (lvalue >= rvalue) addBranchHash(branchHash);
+    addBranchPath(lvalue >= rvalue);
+    if (lvalue >= rvalue) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IF_ACMPEQ */
   public static void ifAcmpEqCheck(Object lvalue, Object rvalue, int branchHash) {
-    if (lvalue == rvalue) addBranchHash(branchHash);
+    addBranchPath(lvalue == rvalue);
+    if (lvalue == rvalue) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IF_ACMPNE */
   public static void ifAcmpNeCheck(Object lvalue, Object rvalue, int branchHash) {
-    if (lvalue == rvalue) addBranchHash(branchHash);
+    addBranchPath(lvalue == rvalue);
+  //TODO[gg]: Shouldn't this be != ?
+    if (lvalue == rvalue) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IFNULL */
   public static void ifNullCheck(Object value, int branchHash) {
-    if (value == null) addBranchHash(branchHash);
+    addBranchPath(value == null);
+    if (value == null) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on IFNONNULL */
   public static void ifNonNullCheck(Object value, int branchHash) {
-    if (value != null) addBranchHash(branchHash);
+    addBranchPath(value != null);
+    if (value != null) {
+      addBranchHash(branchHash);
+    }
   }
 
   /** Called on TABLESWITCH */
@@ -153,6 +218,7 @@ public class BranchTracker {
     // We have to construct a new hash here w/ the value if it's in there
     // TODO: Should I check same labels since that is technically the same branch?
     if (value >= min && value <= max) addBranchHash(Arrays.hashCode(new int[] { branchHash, value }));
+    //TODO[gg]: How should we handle branching here?
   }
 
   /** Called on LOOKUPSWITCH */
@@ -165,6 +231,7 @@ public class BranchTracker {
         return;
       }
     }
+    //TODO[gg]: How should we handle branching here?
   }
 
   /** Called at beginning of catch handlers */

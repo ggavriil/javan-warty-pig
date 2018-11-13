@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.BitSet;
 
 /**
  * Interface for invoking a method with some params and returning the result.
@@ -80,8 +81,9 @@ public interface Invoker {
         }
         long endNs = System.nanoTime();
         BranchHit[] hits = config.tracer.stopTrace(thread);
-        if (ex != null) return new ExecutionResult(config.method, params, hits, endNs - beginNs, ex);
-        return new ExecutionResult(config.method, params, hits, endNs - beginNs, result);
+        BitSet path = BranchTracker.threadBranches.get(thread); //TODO[gg]: Handle this properly (remove on stop)
+        if (ex != null) return new ExecutionResult(config.method, params, hits, endNs - beginNs, ex, path);
+        return new ExecutionResult(config.method, params, hits, endNs - beginNs, result, path);
       }, exec);
     }
 

@@ -45,7 +45,8 @@ public class ExecutionResult {
     this.result = result;
     this.exception = exception;
     this.path = path;
-    this.pathString = BranchTracker.bitsetToString(this.path); //TODO[gg]: This includes a trailing 1
+    this.pathString = "";
+    //this.pathString = BranchTracker.bitsetToString(this.path); //TODO[gg]: This includes a trailing 1
 
   }
 }

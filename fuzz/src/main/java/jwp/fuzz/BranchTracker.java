@@ -13,6 +13,24 @@ public class BranchTracker {
   /** Map storing all hits by thread */
   public static final ConcurrentMap<Thread, BranchHits> branchHits = new ConcurrentHashMap<>();
   public static final ConcurrentMap<Thread, BitSet> threadBranches = new ConcurrentHashMap<>();
+
+
+  public static String bitsetToString(BitSet bs) {
+    int len =  bs.length();
+    int cur = 0;
+    StringBuilder sb = new StringBuilder();
+    int next = bs.nextSetBit(0);
+    while(next > -1) {
+      for(int i = cur; i < next; i++) {
+        sb.append('0');
+      }
+      sb.append('1');
+      cur = next + 1;
+      next = bs.nextSetBit(cur);
+    }
+    return sb.toString();
+  }
+
   /** The set of method refs for the tracker */
   public static final MethodBranchAdapter.MethodRefs refs;
 
@@ -72,6 +90,7 @@ public class BranchTracker {
   /** Stop tracking the given thread. Returns null if never started. */
   public static BranchHits endTrackingForThread(Thread thread) {
     return branchHits.remove(thread);
+    //TODO[gg]: bitset cleanup
   }
 
   /** Internal helper to add a branch hash for the current thread */
@@ -87,8 +106,6 @@ public class BranchTracker {
     addBranchPath(value == 0);
     if (value == 0) {
       addBranchHash(branchHash);
-    } else {
-
     }
   }
 
@@ -225,8 +242,9 @@ public class BranchTracker {
   public static void lookupSwitchCheck(int value, int[] keys, int branchHash) {
     // We have to construct a new hash here w/ the value if it's in there
     // TODO: Should I check same labels since that is technically the same branch?
-    for (int key : keys) {
-      if (value == key) {
+
+    for(int i = 0; i < keys.length; i++) {
+      if (value == keys[i]) {
         addBranchHash(Arrays.hashCode(new int[] { branchHash, value }));
         return;
       }

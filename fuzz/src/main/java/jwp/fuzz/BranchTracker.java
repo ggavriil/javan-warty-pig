@@ -22,9 +22,9 @@ public class BranchTracker {
     int next = bs.nextSetBit(0);
     while(next > -1) {
       for(int i = cur; i < next; i++) {
-        sb.append('0');
+        sb.append('1');
       }
-      sb.append('1');
+      sb.append('0');
       cur = next + 1;
       next = bs.nextSetBit(cur);
     }

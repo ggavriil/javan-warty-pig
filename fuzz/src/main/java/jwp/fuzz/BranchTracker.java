@@ -28,7 +28,7 @@ public class BranchTracker {
       cur = next + 1;
       next = bs.nextSetBit(cur);
     }
-    return sb.toString().substring(sb.length() - 1);
+    return sb.toString();
   }
 
   /** The set of method refs for the tracker */

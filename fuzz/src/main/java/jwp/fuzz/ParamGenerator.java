@@ -1,6 +1,10 @@
 package jwp.fuzz;
 
+import org.omg.CORBA.LongSeqHelper;
+
+import java.beans.IntrospectionException;
 import java.util.*;
+import java.util.function.DoubleBinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -114,27 +118,69 @@ public interface ParamGenerator<T> extends AutoCloseable {
     throw new IllegalArgumentException("No suggested generator for " + cls);
   }
 
+  static<T> ParamGenerator<T> suggestedWithSeeds(Class<T> cls, SeedContainer seeds) {
+    if(SUGGESTABLE_FINITE_CLASSES.contains(cls)) {
+      return suggestedFinite(cls, seeds);
+    }
+    throw new IllegalArgumentException("Cannot use seeds for " + cls);
+  }
+
+
+  static <T> ParamGenerator<T> suggestedFinite(Class<T> cls) {
+    return suggestedFinite(cls, SeedContainer.empty());
+  }
   /**
    * Get a finite parameter generator for the given class. Only some classes are supported. An exception is thrown if a
    * class is not supported.
    */
   @SuppressWarnings("unchecked")
-  static <T> ParamGenerator<T> suggestedFinite(Class<T> cls) {
+  static <T> ParamGenerator<T> suggestedFinite(Class<T> cls, SeedContainer seeds) {
+    //No seeds
     if (cls == Boolean.TYPE) return (ParamGenerator<T>) of(true, false);
     if (cls == Boolean.class) return (ParamGenerator<T>) of(null, true, false);
-    if (cls == Byte.TYPE) return ofFinite(ParamGenerator::interestingBytes);
-    if (cls == Byte.class) return ofFinite(() -> Stream.concat(Stream.of((Integer) null), interestingBytes().boxed()));
-    if (cls == Short.TYPE) return ofFinite(ParamGenerator::interestingShorts);
-    if (cls == Short.class) return ofFinite(() -> Stream.concat(Stream.of((Integer) null), interestingShorts().boxed()));
-    if (cls == Integer.TYPE) return ofFinite(ParamGenerator::interestingInts);
-    if (cls == Integer.class) return ofFinite(() -> Stream.concat(Stream.of((Integer) null), interestingInts().boxed()));
-    if (cls == Long.TYPE) return ofFinite(ParamGenerator::interestingLongs);
-    if (cls == Long.class) return ofFinite(() -> Stream.concat(Stream.of((Long) null), interestingLongs().boxed()));
-    if (cls == Float.TYPE) return ofFinite(ParamGenerator::interestingFloats);
-    if (cls == Float.class) return ofFinite(() -> Stream.concat(Stream.of((Float) null), interestingFloats().boxed()));
-    if (cls == Double.TYPE) return ofFinite(ParamGenerator::interestingDoubles);
+
+    //Int seeds
+    Supplier<IntStream> interestingInts = null;
+    if (cls == Byte.TYPE) interestingInts = ParamGenerator::interestingBytes;
+    if (cls == Short.TYPE) interestingInts = ParamGenerator::interestingShorts;
+    if (cls == Integer.TYPE) interestingInts = ParamGenerator::interestingInts;
+    if(interestingInts != null) {
+      final Supplier<IntStream> finalSupplier = interestingInts;
+      return ofFinite(() -> addIntSeeds(finalSupplier, seeds));
+    }
+
+    Stream interestingIntegers = null;
+    if (cls == Byte.class) interestingIntegers = Stream.concat(Stream.of((Integer) null), interestingBytes().boxed());
+    if (cls == Short.class) interestingIntegers = Stream.concat(Stream.of((Integer) null), interestingShorts().boxed());
+    if (cls == Integer.class) interestingIntegers = Stream.concat(Stream.of((Integer) null), interestingInts().boxed());
+    if(interestingIntegers != null) {
+      final Stream finalStream = interestingIntegers;
+      return ofFinite(() -> Stream.concat(finalStream, seeds.getIntSeeds().boxed()));
+    }
+
+
+    //Long seeds
+    if (cls == Long.TYPE) return ofFinite(() -> addLongSeeds(ParamGenerator::interestingLongs, seeds));
+    if (cls == Long.class) return ofFinite(() -> Stream.concat(Stream.of((Long) null), ((LongStream) addLongSeeds(ParamGenerator::interestingLongs, seeds)).boxed()));
+
+    //Double seeds
+    Supplier<DoubleStream> interestingDoubles = null;
+    if (cls == Float.TYPE) interestingDoubles = ParamGenerator::interestingFloats;
+    if (cls == Double.TYPE) interestingDoubles = ParamGenerator::interestingDoubles;
+    if(interestingDoubles != null) {
+      final Supplier<DoubleStream> finalSupplier = interestingDoubles;
+      return ofFinite(() -> addDoubleSeeds(finalSupplier, seeds));
+    }
+
+    Stream interestingBoxedDoubles = null;
     if (cls == Double.class)
-      return ofFinite(() -> Stream.concat(Stream.of((Double) null), interestingDoubles().boxed()));
+      interestingBoxedDoubles = Stream.concat(Stream.of((Double) null), interestingDoubles().boxed());
+    if (cls == Float.class) interestingBoxedDoubles =  Stream.concat(Stream.of((Float) null), interestingFloats().boxed());
+    if(interestingBoxedDoubles != null) {
+      final Stream finalStream = interestingBoxedDoubles;
+      return ofFinite(() -> Stream.concat(finalStream, seeds.getDoubleSeeds().boxed()));
+    }
+
     if (cls == Character.TYPE) throw new UnsupportedOperationException("TODO");
     if (cls == Character.class) throw new UnsupportedOperationException("TODO");
     throw new IllegalArgumentException("No suggested generator for " + cls);
@@ -159,6 +205,19 @@ public interface ParamGenerator<T> extends AutoCloseable {
   /** Create finite parameter gen from values via {@link #ofFinite(Supplier)} */
   @SafeVarargs
   static <T> ParamGenerator<T> of(T... items) { return ofFinite(() -> Stream.of(items)); }
+
+
+  static BaseStream addIntSeeds(Supplier<IntStream> base, SeedContainer seeds) {
+    return IntStream.concat(seeds.getIntSeeds(), base.get());
+  }
+
+  static BaseStream addDoubleSeeds(Supplier<DoubleStream> base, SeedContainer seeds) {
+    return DoubleStream.concat(seeds.getDoubleSeeds(), base.get());
+  }
+
+  static BaseStream addLongSeeds(Supplier<LongStream> base, SeedContainer seeds) {
+    return LongStream.concat(seeds.getLongSeeds(), base.get());
+  }
 
   /** An int stream of interesting byte values */
   static IntStream interestingBytes() {

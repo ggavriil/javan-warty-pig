@@ -23,6 +23,17 @@ public abstract class ParamProvider implements AutoCloseable {
     return new Suggested(gens);
   }
 
+  public static Suggested suggested(Class<?>[] parameterTypes, SeedContainer[] seeds) {
+    if(parameterTypes.length != seeds.length) {
+      throw new IllegalArgumentException("Both arrays must be of the same size");
+    }
+    ParamGenerator<?>[] gens = new ParamGenerator[parameterTypes.length];
+    for(int i = 0; i < gens.length; i++) {
+      gens[i] = ParamGenerator.suggestedWithSeeds(parameterTypes[i], seeds[i]);
+    }
+    return new Suggested(gens);
+  }
+
   /**
    * The immutable set of parameter generators that are closed when this is and have their
    * {@link ParamGenerator#onResult(ExecutionResult, int, Object)} called via {@link #onResult(ExecutionResult)}.

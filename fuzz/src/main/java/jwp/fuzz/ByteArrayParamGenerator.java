@@ -523,6 +523,7 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
               new RandomHavocTweak.CloneOrInsertBytes(),
               new RandomHavocTweak.OverwriteRandomOrFixedBytes()
           ));
+          tweaks.add(new RandomHavocTweak.OverwriteWithSeed());
           if (!config.dictionary.isEmpty()) {
             tweaks.add(new RandomHavocTweak.OverwriteWithDictionary());
             tweaks.add(new RandomHavocTweak.InsertWithDictionary());

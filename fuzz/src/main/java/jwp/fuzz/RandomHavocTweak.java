@@ -262,6 +262,15 @@ public interface RandomHavocTweak extends BiFunction<ByteArrayParamGenerator, by
     }
   }
 
+  class OverwriteWithSeed extends MutBytesInPlace {
+    @Override
+    public void tweak(ByteArrayParamGenerator gen, byte[] bytes) {
+      byte[] seed = gen.config.externalParamSupplier.get();
+      if(seed != null) {
+        System.arraycopy(seed, 0, bytes, 0, seed.length);
+      }
+    }
+  }
 
   /**
    * Insert a randomly selected entry at a random location using the {@link ByteArrayParamGenerator.Config#dictionary}

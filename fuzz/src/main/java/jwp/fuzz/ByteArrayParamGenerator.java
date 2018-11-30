@@ -485,6 +485,7 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
             new ByteArrayStage.Interesting8(),
             new ByteArrayStage.Interesting16(),
             new ByteArrayStage.Interesting32(),
+            new ByteArrayStage.ZeroBits(),
             new ByteArrayStage.OverwriteWithDictionary(),
             new ByteArrayStage.InsertWithDictionary(),
             // TODO: auto extras
@@ -523,7 +524,7 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
               new RandomHavocTweak.CloneOrInsertBytes(),
               new RandomHavocTweak.OverwriteRandomOrFixedBytes()
           ));
-          tweaks.add(new RandomHavocTweak.OverwriteWithSeed());
+          //tweaks.add(new RandomHavocTweak.OverwriteWithSeed());
           if (!config.dictionary.isEmpty()) {
             tweaks.add(new RandomHavocTweak.OverwriteWithDictionary());
             tweaks.add(new RandomHavocTweak.InsertWithDictionary());

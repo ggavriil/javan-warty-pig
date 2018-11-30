@@ -34,6 +34,15 @@ public interface ByteArrayStage extends BiFunction<ByteArrayParamGenerator, byte
     return apply(gen, entry.bytes);
   }
 
+  class ZeroBits implements ByteArrayStage {
+
+    @Override
+    public Stream<byte[]> apply(ByteArrayParamGenerator gen, byte[] buf) {
+      byte[] zerroArr = new byte[buf.length];
+      return Stream.of(zerroArr);
+    }
+  }
+
   /** Walking bit flip, flipping a configurably-consecutive amount */
   class FlipBits implements ByteArrayStage {
     protected final int consecutiveToFlip;

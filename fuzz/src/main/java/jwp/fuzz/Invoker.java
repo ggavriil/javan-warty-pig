@@ -1,8 +1,10 @@
 package jwp.fuzz;
 
+
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -80,8 +82,9 @@ public interface Invoker {
         }
         long endNs = System.nanoTime();
         BranchHit[] hits = config.tracer.stopTrace(thread);
-        if (ex != null) return new ExecutionResult(config.method, params, hits, endNs - beginNs, ex);
-        return new ExecutionResult(config.method, params, hits, endNs - beginNs, result);
+        BitSet path = BranchTracker.threadBranches.get(thread); //TODO[gg]: Handle this properly (remove on stop)
+        if (ex != null) return new ExecutionResult(config.method, params, hits, endNs - beginNs, ex, path);
+        return new ExecutionResult(config.method, params, hits, endNs - beginNs, result, path);
       }, exec);
     }
 

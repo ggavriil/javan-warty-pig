@@ -1,5 +1,6 @@
 package jwp.fuzz;
 
+import java.util.BitSet;
 import java.lang.reflect.Method;
 
 /** The result of an execution */
@@ -23,21 +24,29 @@ public class ExecutionResult {
    */
   public final Throwable exception;
 
-  public ExecutionResult(Method method, Object[] params, BranchHit[] branchHits, long nanoTime, Object result) {
-    this(method, params, branchHits, nanoTime, result, null);
+  public final BitSet path;
+
+  public final String pathString;
+
+  public ExecutionResult(Method method, Object[] params, BranchHit[] branchHits, long nanoTime, Object result, BitSet path) {
+    this(method, params, branchHits, nanoTime, result, null, path);
   }
 
-  public ExecutionResult(Method method, Object[] params, BranchHit[] branchHits, long nanoTime, Throwable exception) {
-    this(method, params, branchHits, nanoTime, null, exception);
+  public ExecutionResult(Method method, Object[] params, BranchHit[] branchHits, long nanoTime, Throwable exception, BitSet path) {
+    this(method, params, branchHits, nanoTime, null, exception, path);
   }
 
   private ExecutionResult(Method method, Object[] params, BranchHit[] branchHits,
-      long nanoTime, Object result, Throwable exception) {
+                          long nanoTime, Object result, Throwable exception, BitSet path) {
     this.method = method;
     this.params = params;
     this.branchHits = branchHits;
     this.nanoTime = nanoTime;
     this.result = result;
     this.exception = exception;
+    this.path = path;
+    this.pathString = Util.bitsetToString(this.path);
+
   }
 }
+

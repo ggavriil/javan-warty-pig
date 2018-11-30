@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import java.util.function.Supplier;
 
 /**
  * A {@link ParamGenerator} for byte arrays. This class follows <a href="http://lcamtuf.coredump.cx/afl/">AFL</a>
@@ -138,7 +139,8 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
       }
       // Try the input queue first. If nothing, try running the infinite stage with the last entry. If there is no
       // last entry, we are at the beginning and we run with the initial values.
-      TestCase entry = inputQueue.dequeue();
+      byte[] externalValue = config.externalParamSupplier.get();
+      TestCase entry = externalValue != null ? new TestCase(externalValue) : inputQueue.dequeue();
       if (entry == null && lastEntry != null) return stages[stages.length - 1].apply(this, lastEntry);
       Stream<byte[]> startStream = entry == null ? config.initialValues.stream() : Stream.empty();
       Stream<TestCase> entryStream = entry == null ? config.initialValues.stream().map(TestCase::new) : Stream.of(entry);
@@ -294,12 +296,15 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
     /** See {@link Builder#maxInput} */
     public final int maxInput;
 
+    public final Supplier<byte[]> externalParamSupplier;
+
     public Config(List<byte[]> initialValues, List<byte[]> dictionary, BranchHit.Hasher hasher,
         Function<Config, HashCache> hashCacheCreator, Function<Config, InputQueue> inputQueueCreator,
         Function<Config, ByteArrayStage[]> stagesCreator, Function<Config, RandomHavocTweak[]> havocTweaksCreator,
         Random random, boolean reuseLastStageAsInfinite, int arithMax, int havocCycles, int havocCyclesInit,
         int havocCyclesMin, int havocMaxMult, int havocStackPower, int havocBlockSmall,
-        int havocBlockMedium, int havocBlockLarge, int havocBlockXLarge, int maxInput) {
+        int havocBlockMedium, int havocBlockLarge, int havocBlockXLarge, int maxInput,
+        Supplier<byte[]> externalParamSupplier) {
       this.initialValues = Objects.requireNonNull(initialValues);
       // Copy the dictionary and sort it smallest first
       this.dictionary = new ArrayList<>(Objects.requireNonNull(dictionary));
@@ -322,6 +327,7 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
       this.havocBlockLarge = havocBlockLarge;
       this.havocBlockXLarge = havocBlockXLarge;
       this.maxInput = maxInput;
+      this.externalParamSupplier = externalParamSupplier;
     }
 
     /**
@@ -378,6 +384,8 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
       /** Maximum amount of bytes that random havoc cannot go over. Default {@value MAX_INPUT_DEFAULT} */
       public int maxInput = MAX_INPUT_DEFAULT;
 
+      public Supplier<byte[]> externalSupplier = () -> null;
+
       /** See {@link #initialValues(List)} */
       public List<byte[]> initialValues;
       /**
@@ -414,6 +422,12 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
         this.hasher = hasher;
         return this;
       }
+
+      public Builder externlParamSupplier(Supplier<byte[]> supplier) {
+        this.externalSupplier = supplier;
+        return this;
+      }
+
       /** See {@link #hasher(BranchHit.Hasher)} */
       public BranchHit.Hasher hasherDefault() { return BranchHit.Hasher.WITH_HIT_COUNTS; }
 
@@ -565,7 +579,8 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
             havocBlockMedium,
             havocBlockLarge,
             havocBlockXLarge,
-            maxInput
+            maxInput,
+            externalSupplier
         );
       }
     }

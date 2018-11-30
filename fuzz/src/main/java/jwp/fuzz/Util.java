@@ -206,6 +206,23 @@ public class Util {
     return ret;
   }
 
+  // Converts a bitset to a string. It also removes the last 1 in the bitset
+  public static String bitsetToString(BitSet bs) {
+    int len =  bs.length();
+    int cur = 0;
+    StringBuilder sb = new StringBuilder();
+    int next = bs.nextSetBit(0);
+    while(next > -1) {
+      for(int i = cur; i < next; i++) {
+        sb.append('1');
+      }
+      sb.append('0');
+      cur = next + 1;
+      next = bs.nextSetBit(cur);
+    }
+    return sb.substring(0, sb.length() - 1);
+  }
+
   /** An executor service that only runs submissions on the current thread */
   public static class CurrentThreadExecutorService extends ThreadPoolExecutor {
     public CurrentThreadExecutorService() {

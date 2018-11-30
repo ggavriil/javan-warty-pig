@@ -473,23 +473,23 @@ public class ByteArrayParamGenerator implements ParamGenerator<byte[]> {
       /** See {@link #stagesCreator(Function)} */
       public Function<Config, ByteArrayStage[]> stagesCreatorDefault() {
         return config -> new ByteArrayStage[] {
-            new ByteArrayStage.FlipBits(1),
-            new ByteArrayStage.FlipBits(2),
-            new ByteArrayStage.FlipBits(4),
-            new ByteArrayStage.FlipBytes(1),
-            new ByteArrayStage.FlipBytes(2),
-            new ByteArrayStage.FlipBytes(4),
-            new ByteArrayStage.Arith8(),
-            new ByteArrayStage.Arith16(),
-            new ByteArrayStage.Arith32(),
-            new ByteArrayStage.Interesting8(),
-            new ByteArrayStage.Interesting16(),
-            new ByteArrayStage.Interesting32(),
+//            new ByteArrayStage.FlipBits(1),
+//            new ByteArrayStage.FlipBits(2),
+//            new ByteArrayStage.FlipBits(4),
+//            new ByteArrayStage.FlipBytes(1),
+//            new ByteArrayStage.FlipBytes(2),
+//            new ByteArrayStage.FlipBytes(4),
+//            new ByteArrayStage.Arith8(),
+//            new ByteArrayStage.Arith16(),
+//            new ByteArrayStage.Arith32(),
+//            new ByteArrayStage.Interesting8(),
+//            new ByteArrayStage.Interesting16(),
+//            new ByteArrayStage.Interesting32(),
             new ByteArrayStage.ZeroBits(),
-            new ByteArrayStage.OverwriteWithDictionary(),
-            new ByteArrayStage.InsertWithDictionary(),
-            // TODO: auto extras
-            new ByteArrayStage.RandomHavoc(config.havocTweaksCreator.apply(config))
+//            new ByteArrayStage.OverwriteWithDictionary(),
+//            new ByteArrayStage.InsertWithDictionary(),
+//            // TODO: auto extras
+//            new ByteArrayStage.RandomHavoc(config.havocTweaksCreator.apply(config))
         };
       }
 

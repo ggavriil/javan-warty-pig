@@ -1,5 +1,6 @@
 package jwp.fuzz;
 
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.IntStream;
@@ -38,9 +39,14 @@ public interface ByteArrayStage extends BiFunction<ByteArrayParamGenerator, byte
 
     @Override
     public Stream<byte[]> apply(ByteArrayParamGenerator gen, byte[] buf) {
-      System.out.println("ZERO_BITS");
-      byte[] zerroArr = new byte[buf.length];
-      return Stream.of(zerroArr);
+      byte[] seed = gen.config.externalParamSupplier.get();
+      System.out.printf("SEED: %s\n", seed != null ? ByteBuffer.wrap(seed).getInt() : "null");
+      if(seed != null) {
+        byte[] newBytes = new byte[buf.length];
+        System.arraycopy(seed, 0, newBytes, 0, seed.length);
+        return Stream.of(newBytes);
+      }
+      return Stream.of(Arrays.copyOf(buf, buf.length));
     }
   }
 

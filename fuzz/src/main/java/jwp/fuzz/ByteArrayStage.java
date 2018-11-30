@@ -38,6 +38,7 @@ public interface ByteArrayStage extends BiFunction<ByteArrayParamGenerator, byte
 
     @Override
     public Stream<byte[]> apply(ByteArrayParamGenerator gen, byte[] buf) {
+      System.out.println("ZERO_BITS");
       byte[] zerroArr = new byte[buf.length];
       return Stream.of(zerroArr);
     }

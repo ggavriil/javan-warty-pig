@@ -40,7 +40,7 @@ public interface ByteArrayStage extends BiFunction<ByteArrayParamGenerator, byte
     @Override
     public Stream<byte[]> apply(ByteArrayParamGenerator gen, byte[] buf) {
       byte[] seed = gen.config.externalParamSupplier.get();
-      System.out.printf("SEED: %s\n", seed != null ? ByteBuffer.wrap(seed).getInt() : "null");
+      //System.out.printf("SEED: %s\n", seed != null ? ByteBuffer.wrap(seed).getInt() : "null");
       if(seed != null) {
         byte[] newBytes = new byte[buf.length];
         System.arraycopy(seed, 0, newBytes, 0, seed.length);

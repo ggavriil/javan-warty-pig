@@ -110,12 +110,12 @@ public class MethodBranchAdapter extends MethodNode {
         case Opcodes.TABLESWITCH:
           TableSwitchInsnNode tableInsn = (TableSwitchInsnNode) insn;
           // Needs duped value and the min and max consts
-          System.out.printf("TABLESWITCH %s.%s\n", className, name);
+          //System.out.printf("TABLESWITCH %s.%s\n", className, name);
           insertBeforeAndInvokeStaticWithHash(insn, refs.refsByOpcode[op],
               new InsnNode(Opcodes.DUP), new LdcInsnNode(tableInsn.min), new LdcInsnNode(tableInsn.max));
           break;
         case Opcodes.LOOKUPSWITCH:
-          System.out.printf("LOOKUPSWITCH %s.%s\n", className, name);
+          //System.out.printf("LOOKUPSWITCH %s.%s\n", className, name);
           // Needs duped value and an array of all the jump keys
           // XXX: should we really be creating this array here on every lookup? We could just assume this is always
           // a branch and hash off the value. We could also have our own lookup switch but it doesn't give much. We

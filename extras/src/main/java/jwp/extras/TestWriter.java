@@ -115,10 +115,12 @@ public abstract class TestWriter {
         String assertMethodName;
         if (result.method.getReturnType().isArray()) assertMethodName = "assertArrayEquals";
         else assertMethodName = "assertEquals";
+        code.add("/* TODO: Fill in\n");
         CodeBlock.Builder assertCall = CodeBlock.builder().add(
             "$T.$L(", ClassName.get("org.junit", "Assert"), assertMethodName);
         appendItem(code, assertCall, result.result);
         code.add(assertCall.add(", result);\n").build());
+        code.add("*/\n");
       }
       methodBld.addCode(code.build());
       typeBld.addMethod(methodBld.build());

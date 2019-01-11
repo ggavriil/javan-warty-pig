@@ -68,6 +68,7 @@ public abstract class TestWriter {
     return preCall.add(call.build());
   }
 
+
   /**
    * For the given actual item, append its code representation to the code parameter. The preCode parameter is provided
    * as a way for the appender to do some setup if necessary. This only works for some item types, though should improve
@@ -86,7 +87,7 @@ public abstract class TestWriter {
     } else if (item instanceof String) code.add("$L", doubleQuotedString((String) item));
     //else throw new RuntimeException("Unsupported type: " + item.getClass()); // TODO: more
     else {
-      code.add("$L", "[fill in]"); // TODO: more
+      code.add("$L", item); // TODO: more
     }
   }
 

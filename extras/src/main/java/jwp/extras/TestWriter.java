@@ -86,7 +86,6 @@ public abstract class TestWriter {
     } else if (item instanceof String) code.add("$L", doubleQuotedString((String) item));
     //else throw new RuntimeException("Unsupported type: " + item.getClass()); // TODO: more
     else {
-      code.add("// TODO");
       code.add("$L", "[fill in]"); // TODO: more
     }
   }

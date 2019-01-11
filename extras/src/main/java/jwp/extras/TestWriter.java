@@ -84,7 +84,8 @@ public abstract class TestWriter {
       }
       code.add(")");
     } else if (item instanceof String) code.add("$L", doubleQuotedString((String) item));
-    else throw new RuntimeException("Unsupported type: " + item.getClass()); // TODO: more
+    //else throw new RuntimeException("Unsupported type: " + item.getClass()); // TODO: more
+    else code.add("$L", "test"); // TODO: more
   }
 
   /** A {@link TestWriter} to write JUnit 4 unit tests */
